@@ -7,7 +7,7 @@
 # 
 # 
 CFLAGS :=  -ggdb3 -O0 --std=c99 -Wall -Wextra -pedantic
-SDL := `sdl2-config --cflags --libs`
+SDL := `sdl2-config --cflags --libs` -lSDL2_image
 
 HDRS := $(wildcard include/*.h)
 SRC := $(wildcard src/*.c)
