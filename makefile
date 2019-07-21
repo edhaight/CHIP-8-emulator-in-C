@@ -1,24 +1,43 @@
-CFLAGS = -Wall -Wextra -pedantic
+# A simple Makefile for compiling small SDL projects
 
-HDRS=$(wildcard include/*.h)
-SRC=$(wildcard src/*.c)
+# # set the compiler
+# CC := clang
 
-ODIR=obj
-_OBJ=main.o
-OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+# set the compiler flags
+# 
+# 
+CFLAGS :=  -ggdb3 -O0 --std=c99 -Wall -Wextra -pedantic
+SDL := `sdl2-config --cflags --libs`
 
-TARGET = chip8
-CLEANUP= chip8 make.out *.core
+HDRS := $(wildcard include/*.h)
+SRC := $(wildcard src/*.c)
 
-$(TARGET): $(OBJ) 
-	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LIBS)
+ODIR := obj
+_OBJS := main.o
+OBJS := $(patsubst %,$(ODIR)/%,$(_OBJS))
 
+CLEANUP := chip8 *.core
+
+# name of executable
+EXEC := chip8
+
+# default recipe
+all: $(EXEC)
+
+# recipe for building object files
 $(ODIR)/%.o: src/%.c $(HDRS)
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -MMD -c -o $@ $<
 
+# recipe for building the final executable
+$(EXEC): $(OBJS) $(HDRS) makefile
+	$(CC) -o $@ $(OBJS) $(SDL) $(CFLAGS)
+
+# recipe for cleaning workspace
 clean: 
 	@rm -f $(CLEANUP) 
 	@rm -rf $(ODIR)
+
+.PHONY: all clean
 
 -include $(ODIR)/*.d
