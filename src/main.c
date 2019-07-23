@@ -19,6 +19,7 @@ void updatePosition(const Uint8 *keystate, SDL_Rect *dest) {
   if (keystate[SDL_SCANCODE_RIGHT]) {
     x++;
   }
+
   if (x && y) {
     dest->x += x * 10 / sqrt(2);
     dest->y += y * 10 / sqrt(2);
@@ -44,12 +45,13 @@ void updatePosition(const Uint8 *keystate, SDL_Rect *dest) {
 }
 
 int main() {
+
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     printf("error initializing SDL: %s\n", SDL_GetError());
     return 1;
+  } else {
+    printf("Initialization successful\n");
   }
-
-  printf("Initialization successful\n");
 
   SDL_Window *win = SDL_CreateWindow("GAME", // creates a window
                                      SDL_WINDOWPOS_CENTERED,
@@ -77,7 +79,6 @@ int main() {
   // let us control our image position
   // so that we can move it with our keyboard.
   SDL_Rect dest;
-
   // connects our texture with dest to control position
   SDL_QueryTexture(tex, NULL, NULL, &dest.w, &dest.h);
 
@@ -100,8 +101,6 @@ int main() {
   // annimation loop
   while (!close) {
 
-    // Fetch all keypresses
-    SDL_PumpEvents();
     SDL_Event event;
 
     // Events mangement
@@ -114,6 +113,8 @@ int main() {
         break;
 
       case SDL_KEYDOWN:
+        // Fetch all keypresses
+        SDL_PumpEvents();
         break;
       }
     }
