@@ -53,5 +53,6 @@ chip8 initialize(); // Initializes, resets, and returns a chip8 struct
 
 void resetChip(chip8 *myChip8);                // Resets data of chip8 struct
 void loadGame(chip8 *myChip8, char *filename); // Load game into memory
+void emulateCycle(chip8 *myChip8);
 
 #endif

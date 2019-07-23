@@ -55,8 +55,13 @@
 int main()
 {
     chip8 myChip8 = initialize();
+    emulateCycle(&myChip8);
     loadGame(&myChip8, "test/test_opcode.ch8");
-
+    for (int i = 0; i < 10; ++i)
+    {
+        emulateCycle(&myChip8);
+        myChip8.pc += 2;
+    }
     // if (SDL_Init(SDL_INIT_VIDEO) != 0)
     // {
     //     printf("error initializing SDL: %s\n", SDL_GetError());
