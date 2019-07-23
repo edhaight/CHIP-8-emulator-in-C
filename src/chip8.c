@@ -12,6 +12,28 @@ void resetChip(chip8 *myChip8)
     memset(myChip8->memory, 0, sizeof(myChip8->memory)); // Clear Memory
     for (int i = 0; i < 80; ++i)                         // Load fontset
         myChip8->memory[i] = chip8_fontset[i];
+    myChip8->delayTimer = 0; // Reset delay Timer
+    myChip8->soundTimer = 0; // Reset sound Timer
+}
+
+void loadGame(chip8 *myChip8, char *filename)
+{
+    FILE *fptr;
+    if ((fptr = fopen(filename, "rb")) == NULL) // Open in read binary mode
+    {
+        perror("Error");
+        exit(1);
+    }
+    fseek(fptr, 0, SEEK_END); // Move file ptr to end of file
+    long fsize = ftell(fptr); // Store # of bytes from beginning of file ( to end )
+    fseek(fptr, 0, SEEK_SET); // Move file ptr to beginning of file
+
+    unsigned char *buffer = malloc(fsize + 1);      // Allocate space for the buffer
+    fread(buffer, 1, fsize, fptr);                  // Read from file into buffer for fsize bytes
+    memcpy(myChip8->memory + 0x200, buffer, fsize); // Copy buffer into chip memory
+
+    free(buffer); // Free the memory allocated for the buffer
+    fclose(fptr); // Close the file
 }
 
 chip8 initialize()

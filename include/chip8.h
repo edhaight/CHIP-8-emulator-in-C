@@ -49,8 +49,9 @@ static unsigned char chip8_fontset[80] =
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-void resetChip(chip8 *myChip8); // Resets data of chip8 struct
-
 chip8 initialize(); // Initializes, resets, and returns a chip8 struct
+
+void resetChip(chip8 *myChip8);                // Resets data of chip8 struct
+void loadGame(chip8 *myChip8, char *filename); // Load game into memory
 
 #endif
