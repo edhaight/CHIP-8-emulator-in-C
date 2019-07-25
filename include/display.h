@@ -17,7 +17,7 @@ struct display
 };
 typedef struct display display;
 
-int checkDisplayError(char *component, void *pointer);
 int setupDisplay(display *display);
+void cleanupDisplay(display *display);
 
 #endif

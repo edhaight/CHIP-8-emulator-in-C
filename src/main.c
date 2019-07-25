@@ -52,10 +52,6 @@ int main()
     // SDL_Texture *Tile = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
     //                                       SDL_TEXTUREACCESS_STREAMING, 8, 8);
 
-    // //Clean up
-    // SDL_DestroyTexture(Tile);
-    // SDL_DestroyWindow(MainWindow);
-    // SDL_Quit();
-
+    cleanupDisplay(&display);
     return 0;
 }

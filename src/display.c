@@ -1,7 +1,7 @@
 #include "display.h"
 
 // https : //github.com/scanlong/c8/blob/master/src/display.c
-int checkDisplayError(char *component, void *pointer)
+static int checkDisplayError(char *component, void *pointer)
 {
     if (pointer == NULL)
     {
@@ -45,7 +45,18 @@ int setupDisplay(display *display)
                                          WINDOW_WIDTH, WINDOW_HEIGHT);
     // Check if texture creation failed
     if (checkDisplayError("texture", display->texture))
+    {
         return -1;
+    }
 
     return 0;
+}
+
+void cleanupDisplay(display *display)
+{
+    //Clean up
+    SDL_DestroyTexture(display->texture);
+    SDL_DestroyRenderer(display->renderer);
+    SDL_DestroyWindow(display->window);
+    SDL_Quit();
 }
