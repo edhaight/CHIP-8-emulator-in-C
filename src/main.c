@@ -4,65 +4,43 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 
-// void updatePosition(const Uint8 *keystate, SDL_Rect *dest)
-// {
-//     int x = 0;
-//     int y = 0;
-//     if (keystate[SDL_SCANCODE_UP])
-//     {
-//         y--;
-//     }
-//     if (keystate[SDL_SCANCODE_DOWN])
-//     {
-//         y++;
-//     }
-//     if (keystate[SDL_SCANCODE_LEFT])
-//     {
-//         x--;
-//     }
-//     if (keystate[SDL_SCANCODE_RIGHT])
-//     {
-//         x++;
-//     }
-
-//     if (x && y)
-//     {
-//         dest->x += x * 10 / sqrt(2);
-//         dest->y += y * 10 / sqrt(2);
-//     }
-//     else
-//     {
-//         dest->x += x * 10;
-//         dest->y += y * 10;
-//     }
-//     // right boundary
-//     if (dest->x + dest->w > 1000)
-//         dest->x = 1000 - dest->w;
-
-//     // left boundary
-//     if (dest->x < 0)
-//         dest->x = 0;
-
-//     // bottom boundary
-//     if (dest->y + dest->h > 1000)
-//         dest->y = 1000 - dest->h;
-
-//     // upper boundary
-//     if (dest->y < 0)
-//         dest->y = 0;
-// }
+struct display
+{
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    SDL_Texture *texture;
+};
+typedef struct display display;
 
 int main()
 {
-    chip8 myChip8 = initialize();
-    emulateCycle(&myChip8);
-    loadGame(&myChip8, "test/test_opcode.ch8");
-    for (int i = 0; i < 10; ++i)
+    chip8 myChip8;
+    if (initializeChip8(&myChip8)) // Instantiate chip8 struct
     {
-        emulateCycle(&myChip8);
-        myChip8.pc += 2;
+        printf("Failed to initialize chip8 cpu!\n");
+        exit(1);
     }
-    // if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    else
+    {
+        printf("Successfully initialized chip8 cpu!\n");
+    }
+
+    if (loadGame(&myChip8, "test/test_opcode.ch8")) // Load test game
+    {
+        printf("Failed to load game!\n");
+        exit(1);
+    }
+    else
+    {
+        printf("Successfully loaded game!\n");
+    }
+    // for (int i = 0; i < 10; ++i)                // Emulate 10 cycles
+    // {
+    //     emulateCycle(&myChip8);
+    //     myChip8.pc += 2;
+    // }
+
+    // if (SDL_Init(SDL_INIT_VIDEO) != 0) // Try to initialize an SDL video component
     // {
     //     printf("error initializing SDL: %s\n", SDL_GetError());
     //     exit(1);
@@ -72,93 +50,33 @@ int main()
     //     printf("Initialization successful\n");
     // }
 
-    // SDL_Window *win = SDL_CreateWindow("GAME", // creates a window
-    //                                    SDL_WINDOWPOS_CENTERED,
-    //                                    SDL_WINDOWPOS_CENTERED, 1000, 1000, 0);
+    // int baseWidth = 64;
+    // int baseHeight = 32;
+    // int windowScale = 10;
+    // int windowWidth = baseWidth * windowScale;
+    // int windowHeight = baseHeight * windowScale;
 
-    // // triggers the program that controls
-    // // your graphics hardware and sets flags
-    // Uint32 render_flags = SDL_RENDERER_ACCELERATED;
+    // SDL_Init(SDL_INIT_EVERYTHING);
 
-    // // creates a renderer to render our images
-    // SDL_Renderer *rend = SDL_CreateRenderer(win, -1, render_flags);
+    // display->window = SDL_CreateWindow(
+    //     "Chip 8 Emu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+    //     windowWidth, windowHeight, SDL_WINDOW_SHOWN);
+    // if (display_check_error("window", display->window))
+    //     return -1;
 
-    // // creates a surface to load an image into the main memory
-    // SDL_Surface *surface;
+    // SDL_Renderer *renderer = SDL_CreateRenderer(MainWindow, -1, 0);
 
-    // // please provide a path for your image
-    // surface = IMG_Load("test/test.jpg");
+    // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    // // loads image to our graphics hardware memory.
-    // SDL_Texture *tex = SDL_CreateTextureFromSurface(rend, surface);
+    // SDL_RenderClear(renderer);
 
-    // // clears main-memory
-    // SDL_FreeSurface(surface);
+    // SDL_Texture *Tile = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+    //                                       SDL_TEXTUREACCESS_STREAMING, 8, 8);
 
-    // // let us control our image position
-    // // so that we can move it with our keyboard.
-    // SDL_Rect dest;
-    // // connects our texture with dest to control position
-    // SDL_QueryTexture(tex, NULL, NULL, &dest.w, &dest.h);
+    // //Clean up
+    // SDL_DestroyTexture(Tile);
+    // SDL_DestroyWindow(MainWindow);
+    // SDL_Quit();
 
-    // // adjust height and width of our image box.
-    // dest.w /= 4;
-    // dest.h /= 6;
-
-    // // sets initial x-position of object
-    // dest.x = (1000 - dest.w) / 2;
-
-    // // sets initial y-position of object
-    // dest.y = (1000 - dest.h) / 2;
-
-    // // controls annimation loop
-    // int close = 0;
-
-    // // Keyboard state array
-    // const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-
-    // // annimation loop
-    // while (!close)
-    // {
-
-    //     SDL_Event event;
-
-    //     // Events mangement
-    //     while (SDL_PollEvent(&event))
-    //     {
-    //         switch (event.type)
-    //         {
-    //         case SDL_QUIT:
-    //             // handling of close button
-    //             close = 1;
-    //             break;
-    //         case SDL_KEYDOWN:
-    //             break;
-    //         }
-    //     }
-    //     // Update position based on keyboard state
-    //     updatePosition(keystate, &dest);
-    //     // clears the screen
-    //     SDL_RenderClear(rend);
-    //     SDL_RenderCopy(rend, tex, NULL, &dest);
-
-    //     // triggers the double buffers
-    //     // for multiple rendering
-    //     SDL_RenderPresent(rend);
-
-    //     // calculates to 60 fps
-    //     SDL_Delay(1000 / 60);
-    // }
-
-    // // destroy texture
-    // SDL_DestroyTexture(tex);
-
-    // // destroy renderer
-    // SDL_DestroyRenderer(rend);
-
-    // // destroy window
-    // SDL_DestroyWindow(win);
-
-    SDL_Quit();
     return 0;
 }

@@ -29,7 +29,7 @@ struct chip8
 };
 typedef struct chip8 chip8;
 
-static unsigned char chip8_fontset[80] =
+static unsigned char chip8FontSet[80] =
     {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -49,10 +49,9 @@ static unsigned char chip8_fontset[80] =
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-chip8 initialize(); // Initializes, resets, and returns a chip8 struct
+int initializeChip8(chip8 *myChip8);          // Initializes, resets, and returns a chip8 struct
+int loadGame(chip8 *myChip8, char *filename); // Load game into memory
 
-void resetChip(chip8 *myChip8);                // Resets data of chip8 struct
-void loadGame(chip8 *myChip8, char *filename); // Load game into memory
 void emulateCycle(chip8 *myChip8);
 
 #endif
