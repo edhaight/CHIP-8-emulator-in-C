@@ -24,7 +24,7 @@ int setupDisplay(display *display)
     display->window = SDL_CreateWindow("Chip 8 Emu",
                                        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                        WINDOW_WIDTH * WINDOW_SCALE, WINDOW_HEIGHT * WINDOW_SCALE,
-                                       SDL_WINDOW_SHOWN);
+                                       SDL_WINDOW_RESIZABLE);
     // Check if window creation failed
     if (checkDisplayError("window", display->window))
     {
@@ -50,6 +50,13 @@ int setupDisplay(display *display)
     }
 
     return 0;
+}
+
+void drawDisplay(display *display, unsigned char pixels[WINDOW_WIDTH * WINDOW_HEIGHT])
+{
+    SDL_UpdateTexture(display->texture, NULL, pixels, WINDOW_WIDTH * sizeof(unsigned char));
+    SDL_RenderCopy(display->renderer, display->texture, NULL, NULL);
+    SDL_RenderPresent(display->renderer);
 }
 
 void cleanupDisplay(display *display)

@@ -22,35 +22,24 @@ int main()
     testAndPrint("load game", "loaded game", loadGame(&myChip8, "test/test_opcode.ch8"));
     testAndPrint("setup display", "setup display", setupDisplay(&display));
 
-    printf("Chip8 PC: %d\n", myChip8.pc);
+    for (int i = 0; i < 2047; ++i)
+    {
+        myChip8.gfx[i] = ON_COLOR;
+    }
 
-    // for (int i = 0; i < 10; ++i)                // Emulate 10 cycles
-    // {
-    //     emulateCycle(&myChip8);
-    //     myChip8.pc += 2;
-    // }
-
-    //
-
-    // int baseWidth = 64;
-    // int baseHeight = 32;
-    // int windowScale = 10;
-    // int windowWidth = baseWidth * windowScale;
-    // int windowHeight = baseHeight * windowScale;
-
-    // SDL_Init(SDL_INIT_EVERYTHING);
-
-    // if (display_check_error("window", display->window))
-    //     return -1;
-
-    // SDL_Renderer *renderer = SDL_CreateRenderer(MainWindow, -1, 0);
-
-    // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-    // SDL_RenderClear(renderer);
-
-    // SDL_Texture *Tile = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
-    //                                       SDL_TEXTUREACCESS_STREAMING, 8, 8);
+    SDL_Event event;
+    int running = 1;
+    while (running)
+    {
+        drawDisplay(&display, myChip8.gfx);
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
+                running = 0;
+            }
+        }
+    }
 
     cleanupDisplay(&display);
     return 0;

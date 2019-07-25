@@ -20,6 +20,7 @@ struct display
 typedef struct display display;
 
 int setupDisplay(display *display);
+void drawDisplay(display *display, unsigned char pixels[WINDOW_WIDTH * WINDOW_HEIGHT]);
 void cleanupDisplay(display *display);
 
 #endif
