@@ -41,7 +41,7 @@ int setupDisplay(display *display)
 
     // Instantiate Texture
     display->texture = SDL_CreateTexture(display->renderer,
-                                         SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC,
+                                         SDL_PIXELFORMAT_RGB332, SDL_TEXTUREACCESS_STREAMING,
                                          WINDOW_WIDTH, WINDOW_HEIGHT);
     // Check if texture creation failed
     if (checkDisplayError("texture", display->texture))

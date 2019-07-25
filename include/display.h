@@ -8,6 +8,8 @@
 #define WINDOW_WIDTH 64
 #define WINDOW_HEIGHT 32
 #define WINDOW_SCALE 10
+#define ON_COLOR 0xFF
+#define OFF_COLOR 0x00
 
 struct display
 {
