@@ -1,9 +1,50 @@
 #include "chip8.h"
 
+unsigned short opcode = 0;
+
+void cpuNULL(chip8 *myChip8)
+{
+    printf("%d\n", myChip8->pc);
+}
+
+void (*ArithmeticOpcode[])(chip8 *myChip8) = {
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
+	cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL
+};
+
+void cpuARITHMETIC(chip8 *myChip8){
+	ArithmeticOpcode[(myChip8->opcode&0x000F)](myChip8);
+}
+
+void (*execOpcode[])(chip8 *myChip8) = {
+    cpuNULL      , cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, 
+	cpuARITHMETIC, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
+	cpuNULL
+};
+
+void add()
+{
+    printf("OPCODE: 0x1A\n");
+}
+
+void sub()
+{
+    printf("OPCODE: 0x1D\n");
+}
+
+
+// ////////////////////////////////////////////////////////////////////////////////////////////
+
+// Chip8Table =
+//     {
+//         cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
+//         cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
+//         cpuNULL};
+
 int initializeChip8(chip8 *myChip8)
 {
     myChip8->pc = 0x200; // Program counter starts at 0x200
-    myChip8->opcode = 0; // Reset Current
+    myChip8->opcode = 0;
     myChip8->I = 0;      // Reset index register
     myChip8->sp = 0;     // Reset stack pointer
 
@@ -45,26 +86,22 @@ int loadGame(chip8 *myChip8, char *filename)
     return 0;
 }
 
+void fetchOpcode(chip8 *myChip8)
+{
+    unsigned short pc = myChip8->pc;
+    opcode = myChip8->memory[pc] << 8 | myChip8->memory[pc + 1];
+    myChip8->opcode = opcode;
+    // printf("%d\n",opcode);
+    // Copy back pc to chip8 struct
+    myChip8->pc = pc;
+}
 void emulateCycle(chip8 *myChip8)
 {
     // Fetch Opcode
-    unsigned short pc = myChip8->pc;
-    unsigned short opcode = myChip8->memory[pc] << 8 | myChip8->memory[pc + 1];
-    // Decode Opcode
-    switch (opcode & 0xF000)
-    {
-    // Execute Opcode
-    case 0xA000: // ANNN: Sets I to the address NNN
-        myChip8->I = opcode & 0x0FFF;
-        pc += 2;
-        break;
-    // More opcodes //
-    default:
-        printf("Unkown opcode: 0x%X\n", opcode);
-    }
-
-    // Copy back pc to chip8 struct
-    myChip8->pc = pc;
+    fetchOpcode(myChip8);
+    // decode and execute Opcode
+    execOpcode[(opcode&0xF000)>>12](myChip8);
+    
 
     // Update timers
     if (myChip8->delayTimer > 0)
