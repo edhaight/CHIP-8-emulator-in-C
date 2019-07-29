@@ -1,4 +1,8 @@
 #include "chip8.h"
+#include "instruction.h"
+#include "string.h"
+#include "stdlib.h"
+#include "stdio.h"
 
 static unsigned char chip8FontSet[80] =
     {
@@ -20,14 +24,33 @@ static unsigned char chip8FontSet[80] =
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-static void cpuNULL(chip8 *c8);
-static void cpuARITHMETIC(chip8 *c8);
-static void (*ArithmeticOpcode[])(chip8 *c8);
+// Function pointer array declarations
 static void (*execOpcode[])(chip8 *c8);
+static void (*returnClearOpcode[])(chip8 *c8);
+static void (*ArithmeticOpcode[])(chip8 *c8);
+// Function pointer array accessors declarations
+static void cpuRETURNCLEAR(chip8 *c8);
+static void cpuARITHMETIC(chip8 *c8);
 
-static void cpuNULL(chip8 *c8)
+// array of function pointers for entire chip8 instruction set
+static void (*execOpcode[])(chip8 *c8) = {
+    cpuRETURNCLEAR, cpuJump, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuSetVx, cpuNULL,
+    cpuARITHMETIC, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
+    cpuNULL};
+
+// array of function pointers Corresponding to 0x0XXN
+static void (*returnClearOpcode[])(chip8 *c8) = {
+    cpuClearScreen, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuReturnFlow};
+
+// array of function pointers Corresponding to 0x8XXN
+static void (*ArithmeticOpcode[])(chip8 *c8) = {
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL};
+
+static void cpuRETURNCLEAR(chip8 *c8)
 {
-    printf("%d\n", c8->pc);
+    returnClearOpcode[(c8->opcode & 0x000F)](c8);
 }
 
 static void cpuARITHMETIC(chip8 *c8)
@@ -35,21 +58,13 @@ static void cpuARITHMETIC(chip8 *c8)
     ArithmeticOpcode[(c8->opcode & 0x000F)](c8);
 }
 
-static void (*ArithmeticOpcode[])(chip8 *c8) = {
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL};
-
-static void (*execOpcode[])(chip8 *c8) = {
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
-    cpuARITHMETIC, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
-    cpuNULL};
-
 int initializeChip8(chip8 *c8)
 {
-    c8->pc = 0x200; // Program counter starts at 0x200
-    c8->opcode = 0;
-    c8->I = 0;  // Reset index register
-    c8->sp = 0; // Reset stack pointer
+    c8->pc = 0x200;   // Program counter starts at 0x200
+    c8->opcode = 0;   // Reset the opcode
+    c8->I = 0;        // Reset index register
+    c8->sp = 0;       // Reset stack pointer
+    c8->drawFlag = 0; // Reset the draw flag
 
     if (memset(c8->gfx, 0, sizeof(c8->gfx)) == NULL) // Clear display
         return -1;

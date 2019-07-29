@@ -1,3 +1,6 @@
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_timer.h>
 #include "display.h"
 
 // https : //github.com/scanlong/c8/blob/master/src/display.c

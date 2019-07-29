@@ -1,7 +1,3 @@
-#include "string.h"
-#include "stdlib.h"
-#include "stdio.h"
-
 #ifndef CHIP8_H
 #define CHIP8_H
 
@@ -20,6 +16,7 @@ struct chip8
     unsigned short pc; // Program counter 0x000 -> 0xFFF
 
     unsigned char gfx[64 * 32]; // 2048 Total pixels, black or white
+    unsigned char drawFlag;
 
     unsigned char delayTimer; // Ticks at 60Hz, if set above 0: count down to 0
     unsigned char soundTimer; // Ticks at 60Hz, if set above 0: count down to 0
@@ -29,8 +26,8 @@ struct chip8
 };
 typedef struct chip8 chip8;
 
-int initializeChip8(chip8 *myChip8);          // Initializes, resets, and returns a chip8 struct
-int loadGame(chip8 *myChip8, char *filename); // Load game into memory
-void emulateCycle(chip8 *myChip8);            // Emulate a single chip8 instruction
+int initializeChip8(chip8 *c8);          // Initializes, resets, and returns a chip8 struct
+int loadGame(chip8 *c8, char *filename); // Load game into memory
+void emulateCycle(chip8 *c8);            // Emulate a single chip8 instruction
 
 #endif

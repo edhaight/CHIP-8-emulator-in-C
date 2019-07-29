@@ -13,7 +13,7 @@ HDRS := $(wildcard include/*.h)
 SRC := $(wildcard src/*.c)
 
 ODIR := obj
-_OBJS := main.o chip8.o display.o
+_OBJS := main.o chip8.o display.o instruction.o
 OBJS := $(patsubst %,$(ODIR)/%,$(_OBJS))
 
 CLEANUP := chip8 *.core

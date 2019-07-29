@@ -1,3 +1,7 @@
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_timer.h>
+#include "stdio.h"
 #include "chip8.h"
 #include "display.h"
 
@@ -14,25 +18,40 @@ void testAndPrint(char *failMsg, char *successMsg, int failed)
     }
 }
 
+void testPC(unsigned int expected, unsigned int actual)
+{
+    if (expected != actual)
+    {
+        printf("FAIL - %x != %x\n", expected, actual);
+    }
+    else
+    {
+        printf("PASS\n");
+    }
+}
+
 int main()
 {
-    chip8 myChip8;
+    chip8 c8;
     display display;
-    testAndPrint("initialize chip8 cpu", "initialized chip8 cpu", initializeChip8(&myChip8));
-    testAndPrint("load game", "loaded game", loadGame(&myChip8, "test/test_opcode.ch8"));
+    testAndPrint("initialize chip8 cpu", "initialized chip8 cpu", initializeChip8(&c8));
+    testAndPrint("load game", "loaded game", loadGame(&c8, "test/test_opcode.ch8"));
     testAndPrint("setup display", "setup display", setupDisplay(&display));
-    emulateCycle(&myChip8);
+    testPC(0x200, c8.pc);
+    emulateCycle(&c8);
+    testPC(0x262, c8.pc);
+    emulateCycle(&c8);
     // SDL_Event event;
     // int running = 1;
     // int count = 0;
     // while (running)
     // {
-    //     memset(myChip8.gfx, 0, sizeof(myChip8.gfx));
-    //     myChip8.gfx[count] = ON_COLOR;
-    //     myChip8.gfx[count + 1] = ON_COLOR;
-    //     myChip8.gfx[count + 64] = ON_COLOR;
-    //     myChip8.gfx[count + 64 + 1] = ON_COLOR;
-    //     drawDisplay(&display, myChip8.gfx);
+    //     memset(c8.gfx, 0, sizeof(c8.gfx));
+    //     c8.gfx[count] = ON_COLOR;
+    //     c8.gfx[count + 1] = ON_COLOR;
+    //     c8.gfx[count + 64] = ON_COLOR;
+    //     c8.gfx[count + 64 + 1] = ON_COLOR;
+    //     drawDisplay(&display, c8.gfx);
     //     count += 2;
     //     if (count % 64 == 0)
     //         count += 64;
