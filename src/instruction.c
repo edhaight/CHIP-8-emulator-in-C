@@ -44,6 +44,17 @@ void cpuJump(chip8 *c8)
     c8->pc = c8->opcode & 0x0FFF;
 }
 
+/* 
+0x2NNN
+Calls subroutine at NNN.
+*/
+void cpuCallFlow(chip8 *c8)
+{
+    c8->stack[c8->sp] = c8->pc;
+    ++c8->sp;
+    c8->pc = c8->opcode & 0x0FFF;
+}
+
 /*
 0x3XNN
 Skips the next instruction if VX equals NN.
@@ -111,6 +122,103 @@ void cpuIncrementVx(chip8 *c8)
     unsigned char X = (0x0F00 & c8->opcode) >> 8;
     c8->V[X] += value;
     c8->pc += 2;
+}
+
+/*
+0x8XY0
+Sets VX to the value of VY.
+*/
+void cpuSetVxToVy(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    unsigned char Y = (0x00F0 & c8->opcode) >> 4;
+    c8->V[X] = c8->V[Y];
+    c8->pc += 2;
+}
+
+/*
+0x8XY1
+Sets VX to VX | VY. (Bitwise OR operation)
+*/
+void cpuSetVxORVxVy(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    unsigned char Y = (0x00F0 & c8->opcode) >> 4;
+    c8->V[X] = c8->V[X] | c8->V[Y];
+    c8->pc += 2;
+}
+
+/*
+0x8XY2
+Sets VX to VX & VY. (Bitwise AND operation)
+*/
+void cpuSetVxANDVxVy(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    unsigned char Y = (0x00F0 & c8->opcode) >> 4;
+    c8->V[X] = c8->V[X] & c8->V[Y];
+    c8->pc += 2;
+}
+
+/*
+0x8XY3
+Sets VX to VX ^ VY. (Bitwise XOR operation)
+*/
+void cpuSetVxXORVxVy(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    unsigned char Y = (0x00F0 & c8->opcode) >> 4;
+    c8->V[X] = c8->V[X] ^ c8->V[Y];
+    c8->pc += 2;
+}
+
+/*
+0x8XY4
+Adds VY to VX. VF is set to 1 when there's a carry, 
+and to 0 when there isn't.
+*/
+void cpuIncrementVxVy(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    unsigned char Y = (0x00F0 & c8->opcode) >> 4;
+    if (c8->V[X] > 0x00FF - c8->V[Y])
+        c8->V[0xF] = 1;
+    else
+        c8->V[0xF] = 0;
+    c8->V[X] += c8->V[Y];
+    c8->pc += 2;
+}
+
+/*
+0x8XY5
+VY is subtracted from VX. VF is set to 0 when there's 
+a borrow, and 1 when there isn't.
+*/
+void cpuDecrementVxVy(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    unsigned char Y = (0x00F0 & c8->opcode) >> 4;
+    if (c8->V[Y] > c8->V[X])
+        c8->V[0xF] = 0;
+    else
+        c8->V[0xF] = 1;
+    c8->V[X] -= c8->V[Y];
+    c8->pc += 2;
+}
+
+/*
+0x9XNN
+Skips the next instruction if VX doesn't equal VY. 
+(Usually the next instruction is a jump to skip a code block)
+*/
+void cpuSkipNextRegNotEq(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    unsigned char Y = (0x00F0 & c8->opcode) >> 4;
+    if (c8->V[X] != c8->V[Y])
+        c8->pc += 4;
+    else
+        c8->pc += 2;
 }
 
 /* 

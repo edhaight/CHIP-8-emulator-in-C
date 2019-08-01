@@ -14,7 +14,8 @@ void cpuReturnFlow(chip8 *c8);
 
 // 0x1NNN
 void cpuJump(chip8 *c8);
-
+// 0x2NNN
+void cpuCallFlow(chip8 *c8);
 // 0x3XNN
 void cpuSkipNextEq(chip8 *c8);
 // 0x4XNN
@@ -25,6 +26,20 @@ void cpuSkipNextRegEq(chip8 *c8);
 void cpuSetVx(chip8 *c8);
 // 0x7XNN
 void cpuIncrementVx(chip8 *c8);
+// 0x8XY0
+void cpuSetVxToVy(chip8 *c8);
+// 0x8XY1
+void cpuSetVxORVxVy(chip8 *c8);
+// 0x8XY2
+void cpuSetVxANDVxVy(chip8 *c8);
+// 0x8XY3
+void cpuSetVxXORVxVy(chip8 *c8);
+// 0x8XY4
+void cpuIncrementVxVy(chip8 *c8);
+// 0x8XY5
+void cpuDecrementVxVy(chip8 *c8);
+// 0x9XY0
+void cpuSkipNextRegNotEq(chip8 *c8);
 
 // 0xANNN
 void cpuSetI(chip8 *c8);

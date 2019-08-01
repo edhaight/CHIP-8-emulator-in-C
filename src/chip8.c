@@ -38,8 +38,8 @@ static void cpuFXNN(chip8 *c8);
 
 // array of function pointers for entire chip8 instruction set
 static void (*execOpcode[])(chip8 *c8) = {
-    cpu0XXN, cpuJump, cpuNULL, cpuSkipNextEq, cpuSkipNextNotEq, cpuSkipNextRegEq, cpuSetVx, cpuIncrementVx, // 0x0XXX - 0x7XXX
-    cpu8XXN, cpuNULL, cpuSetI, cpuNULL, cpuNULL, cpuDrawSprite, cpuNULL, cpuFXNN                            // 08XXX - 0xFXXX
+    cpu0XXN, cpuJump, cpuCallFlow, cpuSkipNextEq, cpuSkipNextNotEq, cpuSkipNextRegEq, cpuSetVx, cpuIncrementVx, // 0x0XXX - 0x7XXX
+    cpu8XXN, cpuSkipNextRegNotEq, cpuSetI, cpuNULL, cpuNULL, cpuDrawSprite, cpuNULL, cpuFXNN                    // 08XXX - 0xFXXX
 };
 
 // array of function pointers Corresponding to 0x0XXN
@@ -50,8 +50,8 @@ static void (*opcode0XXN[])(chip8 *c8) = {
 
 // array of function pointers Corresponding to 0x8XXN
 static void (*opcode8XXN[])(chip8 *c8) = {
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, // 0x8XX0 - 0x8XX7
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL  // 0x8XX0 - 0x8XXF
+    cpuSetVxToVy, cpuSetVxORVxVy, cpuSetVxANDVxVy, cpuSetVxXORVxVy, cpuIncrementVxVy, cpuDecrementVxVy, cpuNULL, cpuNULL, // 0x8XX0 - 0x8XX7
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL                                                // 0x8XX0 - 0x8XXF
 };
 
 // array of function pointers Corresponding to 0xFXNN

@@ -8,7 +8,7 @@
 #define ON 1
 #define OFF 0
 #define DEFAULT_FRAMERATE 1000 / 60
-#define DEBUG_FRAMERATE 400
+#define DEBUG_FRAMERATE 200
 
 void testAndPrint(char *failMsg, char *successMsg, int failed)
 {
