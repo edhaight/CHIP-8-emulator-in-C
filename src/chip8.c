@@ -65,7 +65,7 @@ static void (*opcodeFXNN[])(chip8 *c8) = {
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuGetDelayTimerVx, //0xFX00-0xFX07
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX08-0xFX0F
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuSetDelayTimerVx, cpuNULL, cpuNULL, //0xFX10-0xFX17
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX18-0xFX1F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuIncrementIVx, cpuNULL,    //0xFX18-0xFX1F
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX20-0xFX27
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX28-0xFX2F
     cpuNULL, cpuNULL, cpuNULL, cpuSetBCD, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX30-0xFX37

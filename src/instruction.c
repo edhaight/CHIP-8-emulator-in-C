@@ -337,6 +337,17 @@ void cpuSetDelayTimerVx(chip8 *c8)
 }
 
 /*
+FX1E
+Adds VX to I
+*/
+void cpuIncrementIVx(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    c8->I += c8->V[X];
+    c8->pc += 2;
+}
+
+/*
 FX33
 Stores the binary-coded decimal representation of VX, with the 
 most significant of three digits at the address in I, the middle 

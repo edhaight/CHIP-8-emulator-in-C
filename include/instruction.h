@@ -56,6 +56,8 @@ void cpuDrawSprite(chip8 *c8);
 void cpuGetDelayTimerVx(chip8 *c8);
 // 0xFX15
 void cpuSetDelayTimerVx(chip8 *c8);
+// 0xFX1E
+void cpuIncrementIVx(chip8 *c8);
 // 0xFX33
 void cpuSetBCD(chip8 *c8);
 // 0xFX55
