@@ -2,8 +2,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 #include "stdio.h"
-#include "chip8.h"
-#include "display.h"
+#include "../include/chip8.h"
+#include "../include/display.h"
 
 void testAndPrint(char *failMsg, char *successMsg, int failed)
 {
@@ -30,43 +30,55 @@ void testPC(unsigned int expected, unsigned int actual)
     }
 }
 
-int main()
+int main(int argc, char **argv)
 {
     chip8 c8;
+    chip8 c8Debug;
     display display;
     testAndPrint("initialize chip8 cpu", "initialized chip8 cpu", initializeChip8(&c8));
     testAndPrint("load game", "loaded game", loadGame(&c8, "test/test_opcode.ch8"));
     testAndPrint("setup display", "setup display", setupDisplay(&display));
-    testPC(0x200, c8.pc);
-    emulateCycle(&c8);
-    testPC(0x262, c8.pc);
-    emulateCycle(&c8);
-    // SDL_Event event;
-    // int running = 1;
-    // int count = 0;
-    // while (running)
-    // {
-    //     memset(c8.gfx, 0, sizeof(c8.gfx));
-    //     c8.gfx[count] = ON_COLOR;
-    //     c8.gfx[count + 1] = ON_COLOR;
-    //     c8.gfx[count + 64] = ON_COLOR;
-    //     c8.gfx[count + 64 + 1] = ON_COLOR;
-    //     drawDisplay(&display, c8.gfx);
-    //     count += 2;
-    //     if (count % 64 == 0)
-    //         count += 64;
-    //     if (count >= 2048)
-    //         count = 0;
 
-    //     while (SDL_PollEvent(&event))
-    //     {
-    //         if (event.type == SDL_QUIT)
-    //         {
-    //             running = 0;
-    //         }
-    //     }
-    //     SDL_Delay(1000 / 60);
-    // }
+    float frameRate = 1000 / 60;
+    if (argc > 1 && (strcmp("-d", argv[1]) == 0))
+    {
+        c8Debug = c8;
+        c8.debug = 1;
+        frameRate = 400;
+    }
+
+    SDL_Event event;
+    int running = 1;
+
+    while (running)
+    {
+
+        if (c8.debug)
+        {
+            c8Debug = c8;
+            emulateCycle(&c8);
+            printChip8Updates(c8Debug, c8);
+        }
+        else
+        {
+            emulateCycle(&c8);
+        }
+
+        if (c8.drawFlag)
+        {
+            drawDisplay(&display, c8.gfx);
+            c8.drawFlag = 0;
+        }
+
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
+                running = 0;
+            }
+        }
+        SDL_Delay(frameRate);
+    }
 
     cleanupDisplay(&display);
     return 0;

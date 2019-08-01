@@ -31,22 +31,43 @@ static void (*ArithmeticOpcode[])(chip8 *c8);
 // Function pointer array accessors declarations
 static void cpuRETURNCLEAR(chip8 *c8);
 static void cpuARITHMETIC(chip8 *c8);
+static void cpuMEMORY(chip8 *c8);
 
 // array of function pointers for entire chip8 instruction set
 static void (*execOpcode[])(chip8 *c8) = {
-    cpuRETURNCLEAR, cpuJump, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuSetVx, cpuNULL,
-    cpuARITHMETIC, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
-    cpuNULL};
+    cpuRETURNCLEAR, cpuJump, cpuNULL, cpuSkipNextEq, cpuSkipNextNotEq, cpuNULL, cpuSetVx, cpuNULL, // 0x0XXX - 0x7XXX
+    cpuARITHMETIC, cpuNULL, cpuSetI, cpuNULL, cpuNULL, cpuDrawSprite, cpuNULL, cpuMEMORY           // 08XXX - 0xFXXX
+};
 
 // array of function pointers Corresponding to 0x0XXN
 static void (*returnClearOpcode[])(chip8 *c8) = {
-    cpuClearScreen, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuReturnFlow};
+    cpuClearScreen, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, // 0x0XX0 - 0x0XX7
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuReturnFlow            // 0x0XX7 - 0x0XXE
+};
 
 // array of function pointers Corresponding to 0x8XXN
 static void (*ArithmeticOpcode[])(chip8 *c8) = {
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL};
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, // 0x8XX0 - 0x8XX7
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL  // 0x8XX0 - 0x8XXF
+};
+
+// array of function pointers Corresponding to 0xFXNN
+static void (*MemoryOpcode[])(chip8 *c8) = {
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX00-0xFX07
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX08-0xFX0F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX10-0xFX17
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX18-0xFX1F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX20-0xFX27
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX28-0xFX2F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX30-0xFX37
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX38-0xFX3F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX40-0xFX47
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX48-0xFX4F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX50-0xFX57
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX58-0xFX5F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuFillRegisters, cpuNULL, cpuNULL, //0xFX60-0xFX67
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX68-0xFX6F
+};
 
 static void cpuRETURNCLEAR(chip8 *c8)
 {
@@ -58,6 +79,69 @@ static void cpuARITHMETIC(chip8 *c8)
     ArithmeticOpcode[(c8->opcode & 0x000F)](c8);
 }
 
+static void cpuMEMORY(chip8 *c8)
+{
+    MemoryOpcode[(c8->opcode & 0x00FF)](c8);
+}
+
+void printChip8(chip8 *c8)
+{
+    printf("\n----Chip 8 State----\n\n");
+    printf("PC: %x\n", c8->pc);
+    printf("Opcode: %x\n", c8->opcode);
+    printf("Index register: %x\n", c8->I);
+
+    printf("\n---REGISTERS----\n");
+    for (int i = 0; i < 16; ++i)
+        printf("V[%d] = %x\n", i, c8->V[i]);
+
+    printf("\nDraw Flag: %d\n", c8->drawFlag);
+
+    printf("Delay Timer: %d\n", c8->delayTimer);
+    printf("Sound Timer: %d\n", c8->soundTimer);
+
+    printf("Stack pointer: %d\n", c8->sp);
+    printf("Stack[%d] = %x\n", c8->sp, c8->stack[c8->sp]);
+
+    printf("Instruction count: %d\n", c8->instructionCount);
+
+    printf("\n");
+}
+
+void printChip8Updates(chip8 prev, chip8 new)
+{
+    printf("\n----Chip 8 Update # %d----\n\n", new.instructionCount);
+    if (prev.pc != new.pc)
+        printf("PC: %x -> %x\n", prev.pc, new.pc);
+    else
+        printf("Warning: PC same as prev instruction (possible infinite loop)\n");
+
+    printf("Opcode: %x\n", new.opcode);
+
+    if (prev.I != new.I)
+        printf("Index Register: %x -> %x\n", prev.I, new.I);
+
+    for (int i = 0; i < 16; ++i)
+        if (prev.V[i] != new.V[i])
+            printf("V[%d]: %x -> %x\n", i, prev.V[i], new.V[i]);
+
+    if (new.drawFlag)
+    {
+        unsigned char height = new.opcode & 0x000F;
+        for (int i = 0; i < height; ++i)
+        {
+            printf("MEM[I+%d] = %x\n", i, new.memory[new.I + i]);
+        }
+    }
+
+    if (prev.sp != new.sp)
+    {
+        printf("Stack pointer: %d -> %d\n", prev.sp, new.sp);
+        printf("Stack[%d] = %x\n", new.sp, new.stack[new.sp]);
+    }
+
+    printf("\n");
+}
 int initializeChip8(chip8 *c8)
 {
     c8->pc = 0x200;   // Program counter starts at 0x200
@@ -80,6 +164,8 @@ int initializeChip8(chip8 *c8)
     c8->delayTimer = 0; // Reset delay Timer
     c8->soundTimer = 0; // Reset sound Timer
 
+    c8->debug = 0;
+    c8->instructionCount = 0;
     return 0;
 }
 
@@ -124,4 +210,5 @@ void emulateCycle(chip8 *c8)
         if (c8->soundTimer == 0)
             printf("Alarm!\n");
     }
+    ++c8->instructionCount;
 }

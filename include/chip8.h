@@ -23,9 +23,14 @@ struct chip8
 
     unsigned short stack[16]; // used to remember current location before a jump is performed
     unsigned short sp;        // Stack pointer
+
+    unsigned short debug;
+    int instructionCount;
 };
 typedef struct chip8 chip8;
 
+void printChip8(chip8 *c8); // For debugging and tracing state of chip8 cpu
+void printChip8Updates(chip8 prev, chip8 new);
 int initializeChip8(chip8 *c8);          // Initializes, resets, and returns a chip8 struct
 int loadGame(chip8 *c8, char *filename); // Load game into memory
 void emulateCycle(chip8 *c8);            // Emulate a single chip8 instruction
