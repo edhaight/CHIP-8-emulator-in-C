@@ -5,7 +5,7 @@
 
 // Instructions definitions
 
-// NULL function
+// NULL cpu op
 void cpuNULL(chip8 *c8)
 {
     printf("Unsupported opcode: %x\n", c8->opcode);
@@ -13,7 +13,10 @@ void cpuNULL(chip8 *c8)
     exit(1);
 }
 
-// Clears the screen
+/*
+0x00E0
+clears the screen
+*/
 void cpuClearScreen(chip8 *c8)
 {
     memset(c8->gfx, 0, sizeof(c8->gfx));
@@ -21,7 +24,10 @@ void cpuClearScreen(chip8 *c8)
     c8->pc += 2;
 }
 
-// return from subroutine, decrement stack pointer
+/*
+0x00EE
+return from subroutine, decrement stack pointer
+*/
 void cpuReturnFlow(chip8 *c8)
 {
     --c8->sp;
@@ -29,13 +35,49 @@ void cpuReturnFlow(chip8 *c8)
     c8->pc += 2;
 }
 
-// Jump instruction, jump to NNN for opcodes 0x1NNN
+/*
+0x1NNN
+Jump instruction, jump to NNN for opcodes
+*/
 void cpuJump(chip8 *c8)
 {
     c8->pc = c8->opcode & 0x0FFF;
 }
 
-// Set register Vx to value NN for opcodes 0x6XNN
+/*
+0x3XNN
+Skips the next instruction if VX equals NN.
+(Usually the next instruction is a jump to skip a code block)
+*/
+void cpuSkipNextEq(chip8 *c8)
+{
+    unsigned char value = 0x00FF & c8->opcode;
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    if (c8->V[X] == value)
+        c8->pc += 4;
+    else
+        c8->pc += 2;
+}
+
+/*
+0x4XNN
+Skips the next instruction if VX does not equals NN.
+(Usually the next instruction is a jump to skip a code block)
+*/
+void cpuSkipNextNotEq(chip8 *c8)
+{
+    unsigned short value = 0x00FF & c8->opcode;
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    if (c8->V[X] != value)
+        c8->pc += 4;
+    else
+        c8->pc += 2;
+}
+
+/*
+0x6XNN
+Set register Vx to value NN for opcodes 
+*/
 void cpuSetVx(chip8 *c8)
 {
     unsigned char value = 0x00FF & c8->opcode;
@@ -44,7 +86,10 @@ void cpuSetVx(chip8 *c8)
     c8->pc += 2;
 }
 
-// Sets I to the address NNN for opcodes 0xaNNN
+/* 
+0xANNN 
+Sets I to the address NNN for opcodes 
+*/
 void cpuSetI(chip8 *c8)
 {
     unsigned short value = 0x0FFF & c8->opcode;
@@ -52,7 +97,8 @@ void cpuSetI(chip8 *c8)
     c8->pc += 2;
 }
 
-/* 
+/*
+DXYN 
 Draws a sprite at coordinate (VX, VY) that has a width of 
 8 pixels and a height of N pixels. Each row of 8 pixels is 
 read as bit-coded starting from memory location I; 
@@ -60,14 +106,7 @@ I value doesn’t change after the execution of this instruction.
 As described above, VF is set to 1 if any screen pixels are 
 flipped from set to unset when the sprite is drawn, and to
 0 if that doesn’t happen
-
-DXYN
-
-D004
-
-0xA0 0x40 0xA0 0xA0
 */
-
 void cpuDrawSprite(chip8 *c8)
 {
     unsigned char X = (0x0F00 & c8->opcode) >> 8;
@@ -93,36 +132,6 @@ void cpuDrawSprite(chip8 *c8)
     }
     c8->drawFlag = 1;
     c8->pc += 2;
-}
-
-/*
-3XNN
-Skips the next instruction if VX equals NN.
-(Usually the next instruction is a jump to skip a code block)
-*/
-void cpuSkipNextEq(chip8 *c8)
-{
-    unsigned char value = 0x00FF & c8->opcode;
-    unsigned char X = (0x0F00 & c8->opcode) >> 8;
-    if (c8->V[X] == value)
-        c8->pc += 4;
-    else
-        c8->pc += 2;
-}
-
-/*
-4XNN
-Skips the next instruction if VX does not equals NN.
-(Usually the next instruction is a jump to skip a code block)
-*/
-void cpuSkipNextNotEq(chip8 *c8)
-{
-    unsigned short value = 0x00FF & c8->opcode;
-    unsigned char X = (0x0F00 & c8->opcode) >> 8;
-    if (c8->V[X] != value)
-        c8->pc += 4;
-    else
-        c8->pc += 2;
 }
 
 /*

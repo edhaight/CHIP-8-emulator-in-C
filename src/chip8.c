@@ -4,6 +4,7 @@
 #include "stdlib.h"
 #include "stdio.h"
 
+// Fontset used for chip8 cpu
 static unsigned char chip8FontSet[80] =
     {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -28,6 +29,7 @@ static unsigned char chip8FontSet[80] =
 static void (*execOpcode[])(chip8 *c8);
 static void (*returnClearOpcode[])(chip8 *c8);
 static void (*ArithmeticOpcode[])(chip8 *c8);
+
 // Function pointer array accessors declarations
 static void cpuRETURNCLEAR(chip8 *c8);
 static void cpuARITHMETIC(chip8 *c8);
@@ -84,30 +86,61 @@ static void cpuMEMORY(chip8 *c8)
     MemoryOpcode[(c8->opcode & 0x00FF)](c8);
 }
 
-void printChip8(chip8 *c8)
+// Debugging functions
+
+/* 
+Prints a sprite, on is '*' char, off is ' ' char
+gets height based on opcode (assumes draw opcode)
+populates char array binaryFormat and prints it.
+*/
+static void printSprite(chip8 c8)
+{
+    unsigned char height = c8.opcode & 0x000F;
+    char binaryFormat[9];
+    binaryFormat[8] = '\0';
+    printf("\n--Sprite--\n");
+    for (int i = 0; i < height; ++i)
+    {
+        for (int j = 0; j < 8; ++j)
+            if ((0x80 >> j) & c8.memory[c8.I + i])
+                binaryFormat[j] = '*';
+            else
+                binaryFormat[j] = ' ';
+        printf("%s\n", binaryFormat);
+    }
+}
+
+/*
+prints all fields of the chip8 structure
+*/
+void printChip8(chip8 c8)
 {
     printf("\n----Chip 8 State----\n\n");
-    printf("PC: %x\n", c8->pc);
-    printf("Opcode: %x\n", c8->opcode);
-    printf("Index register: %x\n", c8->I);
+    printf("PC: %x\n", c8.pc);
+    printf("Opcode: %x\n", c8.opcode);
+    printf("Index register: %x\n", c8.I);
 
     printf("\n---REGISTERS----\n");
     for (int i = 0; i < 16; ++i)
-        printf("V[%d] = %x\n", i, c8->V[i]);
+        printf("V[%d] = %x\n", i, c8.V[i]);
 
-    printf("\nDraw Flag: %d\n", c8->drawFlag);
+    printf("\nDraw Flag: %d\n", c8.drawFlag);
 
-    printf("Delay Timer: %d\n", c8->delayTimer);
-    printf("Sound Timer: %d\n", c8->soundTimer);
+    printf("Delay Timer: %d\n", c8.delayTimer);
+    printf("Sound Timer: %d\n", c8.soundTimer);
 
-    printf("Stack pointer: %d\n", c8->sp);
-    printf("Stack[%d] = %x\n", c8->sp, c8->stack[c8->sp]);
+    printf("Stack pointer: %d\n", c8.sp);
+    printf("Stack[%d] = %x\n", c8.sp, c8.stack[c8.sp]);
 
-    printf("Instruction count: %d\n", c8->instructionCount);
+    printf("Instruction count: %d\n", c8.instructionCount);
 
     printf("\n");
 }
 
+/*
+prints differences between previous state of chip8 cpu (prev)
+and the current state of chip8 cpu (new)
+*/
 void printChip8Updates(chip8 prev, chip8 new)
 {
     printf("\n----Chip 8 Update # %d----\n\n", new.instructionCount);
@@ -126,13 +159,7 @@ void printChip8Updates(chip8 prev, chip8 new)
             printf("V[%d]: %x -> %x\n", i, prev.V[i], new.V[i]);
 
     if (new.drawFlag)
-    {
-        unsigned char height = new.opcode & 0x000F;
-        for (int i = 0; i < height; ++i)
-        {
-            printf("MEM[I+%d] = %x\n", i, new.memory[new.I + i]);
-        }
-    }
+        printSprite(new);
 
     if (prev.sp != new.sp)
     {
@@ -142,6 +169,7 @@ void printChip8Updates(chip8 prev, chip8 new)
 
     printf("\n");
 }
+
 int initializeChip8(chip8 *c8)
 {
     c8->pc = 0x200;   // Program counter starts at 0x200
@@ -164,7 +192,6 @@ int initializeChip8(chip8 *c8)
     c8->delayTimer = 0; // Reset delay Timer
     c8->soundTimer = 0; // Reset sound Timer
 
-    c8->debug = 0;
     c8->instructionCount = 0;
     return 0;
 }
