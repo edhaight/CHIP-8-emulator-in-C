@@ -257,6 +257,19 @@ void cpuSetI(chip8 *c8)
     c8->I = value;
     c8->pc += 2;
 }
+/* 
+0xCXNN
+Sets VX to the result of a bitwise and operation on a 
+random number (Typically: 0 to 255) and NN.
+*/
+void cpuSetVxRandAndNN(chip8 *c8)
+{
+    unsigned char X = (c8->opcode & 0x0F00) >> 8;
+    unsigned char value = c8->opcode & 0x00FF;
+    unsigned char randValue = (rand() % 0xFF);
+    c8->V[X] = randValue & value;
+    c8->pc += 2;
+}
 
 /*
 DXYN 
@@ -268,14 +281,19 @@ As described above, VF is set to 1 if any screen pixels are
 flipped from set to unset when the sprite is drawn, and to
 0 if that doesn’t happen
 */
+
 void cpuDrawSprite(chip8 *c8)
 {
     unsigned char X = (0x0F00 & c8->opcode) >> 8;
     unsigned char Y = (0x00F0 & c8->opcode) >> 4;
+    if (X > 16 || Y > 16)
+        printf("Error! index too large!!\n");
     unsigned char x = c8->V[X];
     unsigned char y = c8->V[Y];
+
     unsigned char height = c8->opcode & 0x000F;
     unsigned char pixel;
+    unsigned short fill;
 
     c8->V[0xF] = 0x00;
     for (int yline = 0; yline < height; ++yline)
@@ -285,13 +303,25 @@ void cpuDrawSprite(chip8 *c8)
         {
             if (((0x80 >> xline) & pixel) != 0)
             {
-                if (c8->gfx[x + xline + ((y + yline) * 64)] == 0xFF)
+                fill = (x + xline + ((y + yline) * 64)) % 2048;
+                if (c8->gfx[fill] == 0xFF)
                     c8->V[0xF] = 1;
-                c8->gfx[x + xline + ((y + yline) * 64)] ^= 0xFF;
+                c8->gfx[fill] ^= 0xFF;
             }
         }
     }
     c8->drawFlag = 1;
+    c8->pc += 2;
+}
+
+/*
+FX07
+Stores the delay timer in Vx.
+*/
+void cpuGetDelayTimerVx(chip8 *c8)
+{
+    unsigned char X = (c8->opcode & 0x0F00) >> 8;
+    c8->V[X] = c8->delayTimer;
     c8->pc += 2;
 }
 

@@ -47,9 +47,13 @@ void cpuSkipNextRegNotEq(chip8 *c8);
 // 0xANNN
 void cpuSetI(chip8 *c8);
 
+// 0xCXNN
+void cpuSetVxRandAndNN(chip8 *c8);
 // 0xDXYN
 void cpuDrawSprite(chip8 *c8);
 
+// 0xFX07
+void cpuGetDelayTimerVx(chip8 *c8);
 // 0xFX15
 void cpuSetDelayTimerVx(chip8 *c8);
 // 0xFX33

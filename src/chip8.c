@@ -41,7 +41,7 @@ static void (*execOpcode[])(chip8 *c8) = {
     cpu0XXN, cpuJump, cpuCallFlow, cpuSkipNextEq,                 // 0x0XXX - 0x3XXX
     cpuSkipNextNotEq, cpuSkipNextRegEq, cpuSetVx, cpuIncrementVx, // 0x4XXX - 0x7XXX
     cpu8XXN, cpuSkipNextRegNotEq, cpuSetI, cpuNULL,               // 0x8XXX - 0xBXXX
-    cpuNULL, cpuDrawSprite, cpuNULL, cpuFXNN                      // 0xCXXX - 0xFXXX
+    cpuSetVxRandAndNN, cpuDrawSprite, cpuNULL, cpuFXNN            // 0xCXXX - 0xFXXX
 };
 
 // array of function pointers Corresponding to 0x0XXN
@@ -62,7 +62,7 @@ static void (*opcode8XXN[])(chip8 *c8) = {
 
 // array of function pointers Corresponding to 0xFXNN
 static void (*opcodeFXNN[])(chip8 *c8) = {
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX00-0xFX07
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuGetDelayTimerVx, //0xFX00-0xFX07
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX08-0xFX0F
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuSetDelayTimerVx, cpuNULL, cpuNULL, //0xFX10-0xFX17
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX18-0xFX1F
