@@ -38,38 +38,44 @@ static void cpuFXNN(chip8 *c8);
 
 // array of function pointers for entire chip8 instruction set
 static void (*execOpcode[])(chip8 *c8) = {
-    cpu0XXN, cpuJump, cpuCallFlow, cpuSkipNextEq, cpuSkipNextNotEq, cpuSkipNextRegEq, cpuSetVx, cpuIncrementVx, // 0x0XXX - 0x7XXX
-    cpu8XXN, cpuSkipNextRegNotEq, cpuSetI, cpuNULL, cpuNULL, cpuDrawSprite, cpuNULL, cpuFXNN                    // 08XXX - 0xFXXX
+    cpu0XXN, cpuJump, cpuCallFlow, cpuSkipNextEq,                 // 0x0XXX - 0x3XXX
+    cpuSkipNextNotEq, cpuSkipNextRegEq, cpuSetVx, cpuIncrementVx, // 0x4XXX - 0x7XXX
+    cpu8XXN, cpuSkipNextRegNotEq, cpuSetI, cpuNULL,               // 0x8XXX - 0xBXXX
+    cpuNULL, cpuDrawSprite, cpuNULL, cpuFXNN                      // 0xCXXX - 0xFXXX
 };
 
 // array of function pointers Corresponding to 0x0XXN
 static void (*opcode0XXN[])(chip8 *c8) = {
-    cpuClearScreen, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, // 0x0XX0 - 0x0XX7
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuReturnFlow            // 0x0XX7 - 0x0XXE
+    cpuClearScreen, cpuNULL, cpuNULL, cpuNULL, // 0x0XX0 - 0x0XX3
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL,        // 0x0XX4 - 0x0XX7
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL,        // 0x0XX8 - 0x0XXB
+    cpuNULL, cpuNULL, cpuReturnFlow            // 0x0XXC - 0x0XXE
 };
 
 // array of function pointers Corresponding to 0x8XXN
 static void (*opcode8XXN[])(chip8 *c8) = {
-    cpuSetVxToVy, cpuSetVxORVxVy, cpuSetVxANDVxVy, cpuSetVxXORVxVy, cpuIncrementVxVy, cpuDecrementVxVy, cpuNULL, cpuNULL, // 0x8XX0 - 0x8XX7
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL                                                // 0x8XX0 - 0x8XXF
+    cpuSetVxToVy, cpuSetVxORVxVy, cpuSetVxANDVxVy, cpuSetVxXORVxVy, // 0x8XX0 - 0x8XX3
+    cpuIncrementVxVy, cpuDecrementVxVy, cpuLSBVxVf, cpuNULL,        // 0x8XX4 - 0x8XX7
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL,                             // 0x8XX8 - 0x8XXB
+    cpuNULL, cpuNULL, cpuMSBVxVf                                    // 0x8XXC - 0x8XXE
 };
 
 // array of function pointers Corresponding to 0xFXNN
 static void (*opcodeFXNN[])(chip8 *c8) = {
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX00-0xFX07
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX08-0xFX0F
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX10-0xFX17
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX18-0xFX1F
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX20-0xFX27
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX28-0xFX2F
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX30-0xFX37
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX38-0xFX3F
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX40-0xFX47
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX48-0xFX4F
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX50-0xFX57
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX58-0xFX5F
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuFillRegisters, cpuNULL, cpuNULL, //0xFX60-0xFX67
-    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX68-0xFX6F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX00-0xFX07
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX08-0xFX0F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuSetDelayTimerVx, cpuNULL, cpuNULL, //0xFX10-0xFX17
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX18-0xFX1F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX20-0xFX27
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX28-0xFX2F
+    cpuNULL, cpuNULL, cpuNULL, cpuSetBCD, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX30-0xFX37
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX38-0xFX3F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX40-0xFX47
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX48-0xFX4F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuStoreRegisters, cpuNULL, cpuNULL,  //0xFX50-0xFX57
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX58-0xFX5F
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuFillRegisters, cpuNULL, cpuNULL,   //0xFX60-0xFX67
+    cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,            //0xFX68-0xFX6F
 };
 
 static void cpu0XXN(chip8 *c8)

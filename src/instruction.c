@@ -207,6 +207,32 @@ void cpuDecrementVxVy(chip8 *c8)
 }
 
 /*
+0x8XY6
+Stores the least significant bit of VX in VF and then 
+shifts VX to the right by 1.
+*/
+void cpuLSBVxVf(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    c8->V[0xF] = c8->V[X] & 0x1;
+    c8->V[X] >>= 1;
+    c8->pc += 2;
+}
+
+/*
+0x8XYE
+Stores the most significant bit of VX in VF and then 
+shifts VX to the left by 1.
+*/
+void cpuMSBVxVf(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    c8->V[0xF] = c8->V[X] >> 7;
+    c8->V[X] <<= 1;
+    c8->pc += 2;
+}
+
+/*
 0x9XNN
 Skips the next instruction if VX doesn't equal VY. 
 (Usually the next instruction is a jump to skip a code block)
@@ -266,6 +292,52 @@ void cpuDrawSprite(chip8 *c8)
         }
     }
     c8->drawFlag = 1;
+    c8->pc += 2;
+}
+
+/*
+FX15
+Sets the delay timer to VX.
+*/
+void cpuSetDelayTimerVx(chip8 *c8)
+{
+    unsigned char X = (c8->opcode & 0x0F00) >> 8;
+    c8->delayTimer = c8->V[X];
+    c8->pc += 2;
+}
+
+/*
+FX33
+Stores the binary-coded decimal representation of VX, with the 
+most significant of three digits at the address in I, the middle 
+digit at I plus 1, and the least significant digit at I plus 2. 
+(In other words, take the decimal representation of VX, place the 
+hundreds digit in memory at location in I, the tens digit at 
+location I+1, and the ones digit at location I+2.)
+*/
+void cpuSetBCD(chip8 *c8)
+{
+    unsigned char X = (c8->opcode & 0x0F00) >> 8;
+    unsigned char value = c8->V[X];
+    c8->memory[c8->I] = value / 100;
+    c8->memory[c8->I + 1] = (value / 10) % 10;
+    c8->memory[c8->I + 2] = value % 10;
+    c8->pc += 2;
+}
+
+/*
+FX55
+Stores V0 to VX (including VX) in memory starting at address I. 
+The offset from I is increased by 1 for each value written, but 
+I itself is left unmodified.
+*/
+void cpuStoreRegisters(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    for (int i = 0; i <= X; ++i)
+    {
+        c8->memory[c8->I + i] = c8->V[i];
+    }
     c8->pc += 2;
 }
 

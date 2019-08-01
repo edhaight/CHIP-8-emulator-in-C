@@ -26,17 +26,17 @@ void testAndPrint(char *failMsg, char *successMsg, int failed)
 int main(int argc, char **argv)
 {
     chip8 c8;
-    chip8 c8Debug;
     display display;
-    float frameRate = DEFAULT_FRAMERATE;
-    char debug = OFF;
     testAndPrint("initialize chip8 cpu", "initialized chip8 cpu", initializeChip8(&c8));
     testAndPrint("load game", "loaded game", loadGame(&c8, "test/test_opcode.ch8"));
     testAndPrint("setup display", "setup display", setupDisplay(&display));
 
+    float frameRate = DEFAULT_FRAMERATE;
+    chip8 c8Debug = c8;
+    char debug = OFF;
+
     if (argc > 1 && (strcmp("-d", argv[1]) == 0))
     {
-        c8Debug = c8;
         debug = ON;
         frameRate = DEBUG_FRAMERATE;
     }
@@ -45,13 +45,14 @@ int main(int argc, char **argv)
     char running = ON;
     while (running)
     {
-        emulateCycle(&c8);
 
         if (debug)
         {
             printChip8Updates(c8Debug, c8);
             c8Debug = c8;
         }
+
+        emulateCycle(&c8);
 
         if (c8.drawFlag)
         {

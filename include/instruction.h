@@ -8,10 +8,10 @@
 // Null op
 void cpuNULL(chip8 *c8);
 
-// 0x00EX
+// 0x00E0
 void cpuClearScreen(chip8 *c8);
+// 0x00EE
 void cpuReturnFlow(chip8 *c8);
-
 // 0x1NNN
 void cpuJump(chip8 *c8);
 // 0x2NNN
@@ -38,15 +38,24 @@ void cpuSetVxXORVxVy(chip8 *c8);
 void cpuIncrementVxVy(chip8 *c8);
 // 0x8XY5
 void cpuDecrementVxVy(chip8 *c8);
+// 0x8XY6
+void cpuLSBVxVf(chip8 *c8);
+// 0x8XYE
+void cpuMSBVxVf(chip8 *c8);
 // 0x9XY0
 void cpuSkipNextRegNotEq(chip8 *c8);
-
 // 0xANNN
 void cpuSetI(chip8 *c8);
 
 // 0xDXYN
 void cpuDrawSprite(chip8 *c8);
 
+// 0xFX15
+void cpuSetDelayTimerVx(chip8 *c8);
+// 0xFX33
+void cpuSetBCD(chip8 *c8);
+// 0xFX55
+void cpuStoreRegisters(chip8 *c8);
 // 0xFX65
 void cpuFillRegisters(chip8 *c8);
 
