@@ -23,6 +23,8 @@ void cpuSkipNextNotEq(chip8 *c8);
 void cpuSkipNextRegEq(chip8 *c8);
 // 0x6XNN
 void cpuSetVx(chip8 *c8);
+// 0x7XNN
+void cpuIncrementVx(chip8 *c8);
 
 // 0xANNN
 void cpuSetI(chip8 *c8);

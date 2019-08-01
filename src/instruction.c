@@ -96,8 +96,20 @@ Set register Vx to value NN for opcodes
 void cpuSetVx(chip8 *c8)
 {
     unsigned char value = 0x00FF & c8->opcode;
-    unsigned char index = (0x0F00 & c8->opcode) >> 8;
-    c8->V[index] = value;
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    c8->V[X] = value;
+    c8->pc += 2;
+}
+
+/*
+0x7XNN
+Adds NN to VX. (Carry flag is not changed)
+*/
+void cpuIncrementVx(chip8 *c8)
+{
+    unsigned char value = 0x00FF & c8->opcode;
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    c8->V[X] += value;
     c8->pc += 2;
 }
 
