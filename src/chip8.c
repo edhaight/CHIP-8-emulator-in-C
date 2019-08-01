@@ -38,8 +38,8 @@ static void cpuFXNN(chip8 *c8);
 
 // array of function pointers for entire chip8 instruction set
 static void (*execOpcode[])(chip8 *c8) = {
-    cpu0XXN, cpuJump, cpuNULL, cpuSkipNextEq, cpuSkipNextNotEq, cpuNULL, cpuSetVx, cpuNULL, // 0x0XXX - 0x7XXX
-    cpu8XXN, cpuNULL, cpuSetI, cpuNULL, cpuNULL, cpuDrawSprite, cpuNULL, cpuFXNN            // 08XXX - 0xFXXX
+    cpu0XXN, cpuJump, cpuNULL, cpuSkipNextEq, cpuSkipNextNotEq, cpuSkipNextRegEq, cpuSetVx, cpuNULL, // 0x0XXX - 0x7XXX
+    cpu8XXN, cpuNULL, cpuSetI, cpuNULL, cpuNULL, cpuDrawSprite, cpuNULL, cpuFXNN                     // 08XXX - 0xFXXX
 };
 
 // array of function pointers Corresponding to 0x0XXN

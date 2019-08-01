@@ -19,7 +19,8 @@ void cpuJump(chip8 *c8);
 void cpuSkipNextEq(chip8 *c8);
 // 0x4XNN
 void cpuSkipNextNotEq(chip8 *c8);
-
+// 0x5XY0
+void cpuSkipNextRegEq(chip8 *c8);
 // 0x6XNN
 void cpuSetVx(chip8 *c8);
 

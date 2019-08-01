@@ -6,7 +6,7 @@
 # set the compiler flags
 # 
 # 
-CFLAGS :=  -ggdb3 -O0 --std=c99 -Wall -Wextra -pedantic -Iinclude
+CFLAGS :=  -ggdb3 -O3 --std=c99 -Wall -Wextra -pedantic -Iinclude
 SDL := `sdl2-config --cflags --libs` -lSDL2_image
 
 HDRS := $(wildcard include/*.h)

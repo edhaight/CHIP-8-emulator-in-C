@@ -75,6 +75,21 @@ void cpuSkipNextNotEq(chip8 *c8)
 }
 
 /*
+0x5XY0
+Skips the next instruction if VX equals VY. 
+(Usually the next instruction is a jump to skip a code block)
+*/
+void cpuSkipNextRegEq(chip8 *c8)
+{
+    unsigned char X = (0x0F00 & c8->opcode) >> 8;
+    unsigned char Y = (0x00F0 & c8->opcode) >> 4;
+    if (c8->V[X] == c8->V[Y])
+        c8->pc += 4;
+    else
+        c8->pc += 2;
+}
+
+/*
 0x6XNN
 Set register Vx to value NN for opcodes 
 */
