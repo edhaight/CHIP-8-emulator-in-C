@@ -27,34 +27,35 @@ static unsigned char chip8FontSet[80] =
 
 // Function pointer array declarations
 static void (*execOpcode[])(chip8 *c8);
-static void (*returnClearOpcode[])(chip8 *c8);
-static void (*ArithmeticOpcode[])(chip8 *c8);
+static void (*opcode0XXN[])(chip8 *c8);
+static void (*opcode8XXN[])(chip8 *c8);
+static void (*opcodeFXNN[])(chip8 *c8);
 
 // Function pointer array accessors declarations
-static void cpuRETURNCLEAR(chip8 *c8);
-static void cpuARITHMETIC(chip8 *c8);
-static void cpuMEMORY(chip8 *c8);
+static void cpu0XXN(chip8 *c8);
+static void cpu8XXN(chip8 *c8);
+static void cpuFXNN(chip8 *c8);
 
 // array of function pointers for entire chip8 instruction set
 static void (*execOpcode[])(chip8 *c8) = {
-    cpuRETURNCLEAR, cpuJump, cpuNULL, cpuSkipNextEq, cpuSkipNextNotEq, cpuNULL, cpuSetVx, cpuNULL, // 0x0XXX - 0x7XXX
-    cpuARITHMETIC, cpuNULL, cpuSetI, cpuNULL, cpuNULL, cpuDrawSprite, cpuNULL, cpuMEMORY           // 08XXX - 0xFXXX
+    cpu0XXN, cpuJump, cpuNULL, cpuSkipNextEq, cpuSkipNextNotEq, cpuNULL, cpuSetVx, cpuNULL, // 0x0XXX - 0x7XXX
+    cpu8XXN, cpuNULL, cpuSetI, cpuNULL, cpuNULL, cpuDrawSprite, cpuNULL, cpuFXNN            // 08XXX - 0xFXXX
 };
 
 // array of function pointers Corresponding to 0x0XXN
-static void (*returnClearOpcode[])(chip8 *c8) = {
+static void (*opcode0XXN[])(chip8 *c8) = {
     cpuClearScreen, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, // 0x0XX0 - 0x0XX7
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuReturnFlow            // 0x0XX7 - 0x0XXE
 };
 
 // array of function pointers Corresponding to 0x8XXN
-static void (*ArithmeticOpcode[])(chip8 *c8) = {
+static void (*opcode8XXN[])(chip8 *c8) = {
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, // 0x8XX0 - 0x8XX7
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL  // 0x8XX0 - 0x8XXF
 };
 
 // array of function pointers Corresponding to 0xFXNN
-static void (*MemoryOpcode[])(chip8 *c8) = {
+static void (*opcodeFXNN[])(chip8 *c8) = {
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX00-0xFX07
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX08-0xFX0F
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX10-0xFX17
@@ -71,19 +72,19 @@ static void (*MemoryOpcode[])(chip8 *c8) = {
     cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL, cpuNULL,          //0xFX68-0xFX6F
 };
 
-static void cpuRETURNCLEAR(chip8 *c8)
+static void cpu0XXN(chip8 *c8)
 {
-    returnClearOpcode[(c8->opcode & 0x000F)](c8);
+    opcode0XXN[(c8->opcode & 0x000F)](c8);
 }
 
-static void cpuARITHMETIC(chip8 *c8)
+static void cpu8XXN(chip8 *c8)
 {
-    ArithmeticOpcode[(c8->opcode & 0x000F)](c8);
+    opcode8XXN[(c8->opcode & 0x000F)](c8);
 }
 
-static void cpuMEMORY(chip8 *c8)
+static void cpuFXNN(chip8 *c8)
 {
-    MemoryOpcode[(c8->opcode & 0x00FF)](c8);
+    opcodeFXNN[(c8->opcode & 0x00FF)](c8);
 }
 
 // Debugging functions
